@@ -87,29 +87,33 @@
 
     /* ---- Current page card ---- */
     .page {
-      border: 1px solid var(--line); border-radius: var(--radius);
-      padding: 9px 10px; margin-bottom: 14px; background: var(--field);
+      border: 1px solid var(--line); border-radius: 8px;
+      padding: 11px 12px; margin-bottom: 14px; background: var(--field);
     }
-    .page-row { display: flex; align-items: center; gap: 8px; }
+    .page-row { display: flex; align-items: center; gap: 13px; }
     .fav {
-      width: 16px; height: 16px; border-radius: 4px; flex: 0 0 auto;
+      width: 18px; height: 18px; border-radius: 4px; flex: 0 0 auto;
       background: var(--hover); object-fit: contain;
     }
     .page-text { min-width: 0; flex: 1; }
     .page-title {
-      font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      font-weight: 500; line-height: 1.35; margin-bottom: 3px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    /* URL doubles as an inline editable field: reads as muted text, reveals a
-       border on hover/focus so you can tweak what gets saved. */
+    /* URL is an editable field that reads as plain muted text. No box: it sits
+       flush in the text column, and a single underline appears only while you're
+       editing — so it never looks layered or like a clickable link at rest. */
     .page-url {
-      width: 100%; margin-top: 2px; padding: 1px 4px; margin-left: -4px;
-      font-family: var(--font); font-size: 12px; color: var(--ink-faint);
-      border: 1px solid transparent; border-radius: 4px; background: transparent;
-      outline: none; text-overflow: ellipsis;
-      transition: border-color .12s ease, color .12s ease, background .12s ease;
+      display: block; width: 100%; margin: 0; padding: 0 0 2px;
+      line-height: 1.4; font-family: var(--font); font-size: 12px;
+      color: var(--ink-faint);
+      border: none; border-bottom: 1px solid transparent;
+      border-radius: 0; background: transparent; outline: none;
+      text-overflow: ellipsis;
+      transition: color .12s ease, border-color .12s ease;
     }
-    .page-url:hover { border-color: var(--line-2); }
-    .page-url:focus { color: var(--ink); border-color: var(--accent); background: var(--bg); }
+    .page-url:hover { color: var(--ink-soft); }
+    .page-url:focus { color: var(--ink); border-bottom-color: var(--accent); }
 
     /* ---- Alias field ---- */
     .label {
@@ -208,7 +212,7 @@
     <div class="label">Give it a short alias</div>
     <div class="field-row">
       <span class="prefix">go</span>
-      <input id="alias" type="text" placeholder="cal"
+      <input id="alias" type="text" placeholder="e.g. cal, mail, docs"
              autocomplete="off" autocapitalize="off" spellcheck="false" autofocus />
     </div>
 

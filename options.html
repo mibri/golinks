@@ -104,6 +104,14 @@
     .seg button + button { border-left: 1px solid var(--line-2); }
     .seg svg { color: var(--ink-faint); }
 
+    /* Theme switch: quieter than the modal's type selector. */
+    #themeSeg { border-color: var(--line); }
+    #themeSeg button { color: var(--ink-faint); padding: 5px 11px; }
+    #themeSeg button:hover { background: var(--hover); }
+    #themeSeg button.active { background: var(--hover); color: var(--ink); }
+    #themeSeg button.active svg { color: var(--ink-soft); }
+    #themeSeg button + button { border-left-color: var(--line); }
+
     /* ---- Usage note ---- */
     .usage {
       display: flex; gap: 10px; align-items: flex-start;
@@ -288,6 +296,11 @@
         <b>How to use:</b> Click the address bar, type <span class="kbd">go</span> then press
         <span class="kbd">Space</span> or <span class="kbd">Tab</span>, then your alias and Enter.
         For example, <code>go cal</code> opens your calendar shortcut. Unknown text becomes a Google search.
+        <div style="margin-top:8px">
+          <b>Add shortcuts fast:</b> open this popup anytime with
+          <span class="kbd">⌘ Shift .</span> on Mac or <span class="kbd">Ctrl Shift .</span> on
+          Windows/Linux. Rebind or disable it at <code>chrome://extensions/shortcuts</code>.
+        </div>
       </div>
     </div>
 
