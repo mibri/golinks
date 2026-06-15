@@ -58,14 +58,15 @@
   /* --------------------------------------------------------------- */
 
   function currentTarget() {
-    if (!activeTab) return "";
+    const base = els.pageUrl.value.trim();
+    if (!base) return "";
     const alias = els.alias.value.trim();
-    return alias.includes("{*}") ? templatize(activeTab.url || "") : activeTab.url || "";
+    return alias.includes("{*}") ? templatize(base) : base;
   }
 
   function render() {
     const alias = els.alias.value.trim();
-    els.save.disabled = !alias || !activeTab;
+    els.save.disabled = !alias || !els.pageUrl.value.trim();
 
     if (!alias) {
       els.map.innerHTML = "";
@@ -86,11 +87,12 @@
 
   async function save() {
     const alias = els.alias.value.trim();
-    if (!alias || !activeTab) return;
+    const target = currentTarget();
+    if (!alias || !target) return;
 
     const links = await gsGetLinks();
     const exists = Object.prototype.hasOwnProperty.call(links, alias);
-    links[alias] = { type: "single", target: currentTarget() };
+    links[alias] = { type: "single", target: gsNormalizeUrl(target) };
     await gsSetLinks(links);
 
     showToast(exists ? "Updated “go " + alias + "”" : "Saved “go " + alias + "”");
@@ -110,7 +112,11 @@
   /* --------------------------------------------------------------- */
 
   els.alias.addEventListener("input", render);
+  els.pageUrl.addEventListener("input", render);
   els.alias.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); save(); }
+  });
+  els.pageUrl.addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); save(); }
   });
   els.save.addEventListener("click", save);
@@ -127,12 +133,12 @@
 
     if (activeTab) {
       els.pageTitle.textContent = activeTab.title || "Untitled";
-      els.pageUrl.textContent = activeTab.url || "";
+      els.pageUrl.value = activeTab.url || "";
       if (activeTab.favIconUrl) els.fav.src = activeTab.favIconUrl;
       else els.fav.style.visibility = "hidden";
     } else {
       els.pageTitle.textContent = "No active tab";
-      els.pageUrl.textContent = "";
+      els.pageUrl.value = "";
       els.fav.style.visibility = "hidden";
     }
     render();

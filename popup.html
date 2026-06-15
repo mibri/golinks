@@ -14,14 +14,16 @@
     }
 
     /* ---- Light theme (default) ---- */
+    /* Warm off-white body with pure-white cards layered on top — softens the
+       otherwise harsh flat-white popup edge. */
     :root, :root[data-theme="light"] {
       --ink:        #37352f;
       --ink-soft:   #787774;
       --ink-faint:  #9b9a97;
       --line:       rgba(55, 53, 47, 0.09);
       --line-2:     rgba(55, 53, 47, 0.16);
-      --hover:      rgba(55, 53, 47, 0.06);
-      --bg:         #ffffff;
+      --hover:      rgba(55, 53, 47, 0.05);
+      --bg:         #f7f7f5;
       --field:      #ffffff;
       --accent:     #2383e2;
       --accent-bg:  rgba(35, 131, 226, 0.08);
@@ -67,7 +69,7 @@
     .wrap { padding: 14px 14px 13px; }
 
     /* ---- Header ---- */
-    .head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .head { display: flex; align-items: center; gap: 8px; margin-bottom: 13px; }
     .mark {
       width: 20px; height: 20px; border-radius: 5px; background: var(--ink);
       display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
@@ -83,8 +85,6 @@
     .manage:hover { background: var(--hover); color: var(--ink); }
     .manage svg { color: var(--ink-faint); }
 
-    .lead { font-size: 12.5px; color: var(--ink-faint); margin: 0 0 12px 28px; }
-
     /* ---- Current page card ---- */
     .page {
       border: 1px solid var(--line); border-radius: var(--radius);
@@ -99,10 +99,17 @@
     .page-title {
       font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    /* URL doubles as an inline editable field: reads as muted text, reveals a
+       border on hover/focus so you can tweak what gets saved. */
     .page-url {
-      color: var(--ink-faint); font-size: 12px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;
+      width: 100%; margin-top: 2px; padding: 1px 4px; margin-left: -4px;
+      font-family: var(--font); font-size: 12px; color: var(--ink-faint);
+      border: 1px solid transparent; border-radius: 4px; background: transparent;
+      outline: none; text-overflow: ellipsis;
+      transition: border-color .12s ease, color .12s ease, background .12s ease;
     }
+    .page-url:hover { border-color: var(--line-2); }
+    .page-url:focus { color: var(--ink); border-color: var(--accent); background: var(--bg); }
 
     /* ---- Alias field ---- */
     .label {
@@ -187,14 +194,13 @@
       </button>
     </div>
 
-    <p class="lead">Save the page below as a <b>go</b> shortcut.</p>
-
     <div class="page">
       <div class="page-row">
         <img id="fav" class="fav" alt="" />
         <div class="page-text">
           <div id="pageTitle" class="page-title">Loading…</div>
-          <div id="pageUrl" class="page-url"></div>
+          <input id="pageUrl" class="page-url" type="text" spellcheck="false"
+                 autocomplete="off" autocapitalize="off" aria-label="URL to save" />
         </div>
       </div>
     </div>
@@ -202,7 +208,7 @@
     <div class="label">Give it a short alias</div>
     <div class="field-row">
       <span class="prefix">go</span>
-      <input id="alias" type="text" placeholder="calendar"
+      <input id="alias" type="text" placeholder="cal"
              autocomplete="off" autocapitalize="off" spellcheck="false" autofocus />
     </div>
 
