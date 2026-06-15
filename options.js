@@ -19,6 +19,10 @@
     qUrl: $("qUrl"),
     qAdd: $("qAdd"),
     qHint: $("qHint"),
+    count: $("count"),
+    searchbar: $("searchbar"),
+    search: $("search"),
+    searchClear: $("searchClear"),
     list: $("list"),
     raw: $("raw"),
     rawMsg: $("rawMsg"),
@@ -53,6 +57,7 @@
   let editingAlias = null; // alias being edited, or null for "new"
   let editType = "single";
   let rawDirty = false;
+  let query = "";        // current search filter
 
   /* =============================================================== */
   /* List rendering                                                  */
@@ -65,18 +70,41 @@
     return escapeHtml(alias).replace(/\{\*\}/g, '<span class="star">{*}</span>');
   }
 
+  /** Does an entry match the current search query (alias or any target URL)? */
+  function matchesQuery(alias, cfg) {
+    if (!query) return true;
+    const hay =
+      alias + " " + (cfg.type === "bundle" ? (cfg.targets || []).join(" ") : cfg.target || "");
+    return hay.toLowerCase().includes(query);
+  }
+
   function renderList() {
-    const entries = Object.entries(links);
+    const all = Object.entries(links).sort((a, b) => a[0].localeCompare(b[0]));
+    const total = all.length;
+    const entries = all.filter(([alias, cfg]) => matchesQuery(alias, cfg));
+
+    el.count.textContent = total
+      ? query ? " · " + entries.length + " of " + total : " · " + total
+      : "";
+
+    // The search bar is only useful once there's something to search.
+    el.searchbar.style.display = total ? "" : "none";
+
     el.list.innerHTML = "";
 
-    if (!entries.length) {
+    if (!total) {
       el.list.innerHTML =
         '<div class="empty"><strong>No shortcuts yet</strong>' +
-        "Add one with “New shortcut”, or from the toolbar popup on any page.</div>";
+        "Add one above with the quick-add bar, “New (advanced)”, or the toolbar popup on any page.</div>";
+      return;
+    }
+    if (!entries.length) {
+      el.list.innerHTML =
+        '<div class="empty"><strong>No matches</strong>' +
+        "Nothing matches “" + escapeHtml(query) + "”.</div>";
       return;
     }
 
-    entries.sort((a, b) => a[0].localeCompare(b[0]));
     for (const [alias, cfg] of entries) {
       el.list.appendChild(renderRow(alias, cfg));
     }
@@ -106,10 +134,12 @@
       "</div>" +
       '<div class="badges">' + badges.join("") + "</div>" +
       '<div class="row-actions">' +
+        '<button class="icon-btn open" title="Open in a new tab"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M6 3H3.5A1.5 1.5 0 0 0 2 4.5v7A1.5 1.5 0 0 0 3.5 13h7A1.5 1.5 0 0 0 12 11.5V9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M9 2h4v4M13 2 7 8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
         '<button class="icon-btn edit" title="Edit"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M10.5 2.5 12.5 4.5 5 12l-2.5.5.5-2.5 7.5-7.5Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></button>' +
         '<button class="icon-btn del" title="Delete"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M3 4h9M6 4V2.8h3V4M5 4l.5 8h4L10 4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>' +
       "</div>";
 
+    row.querySelector(".open").addEventListener("click", () => openShortcut(alias));
     row.querySelector(".edit").addEventListener("click", () => openModal(alias));
     row.querySelector(".del").addEventListener("click", () => deleteAlias(alias));
     return row;
@@ -119,6 +149,16 @@
     if (!confirm('Delete shortcut "go ' + alias + '"?')) return;
     delete links[alias];
     await persist();
+  }
+
+  /** Open a shortcut's destination(s) to test it. Wildcards open their base. */
+  function openShortcut(alias) {
+    const cfg = links[alias];
+    if (!cfg) return;
+    const urls = cfg.type === "bundle"
+      ? (cfg.targets || [])
+      : [(cfg.target || "").split("{*}").join("")];
+    urls.filter(Boolean).forEach((u) => chrome.tabs.create({ url: gsNormalizeUrl(u) }));
   }
 
   /* =============================================================== */
@@ -389,6 +429,21 @@
   [el.qAlias, el.qUrl].forEach((input) =>
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") quickAdd(); })
   );
+
+  function applySearch() {
+    query = el.search.value.trim().toLowerCase();
+    el.searchbar.classList.toggle("has-text", el.search.value.length > 0);
+    renderList();
+  }
+  el.search.addEventListener("input", applySearch);
+  el.search.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && el.search.value) { el.search.value = ""; applySearch(); }
+  });
+  el.searchClear.addEventListener("click", () => {
+    el.search.value = "";
+    applySearch();
+    el.search.focus();
+  });
 
   el.newBtn.addEventListener("click", () => openModal(null));
   el.modalCancel.addEventListener("click", closeModal);

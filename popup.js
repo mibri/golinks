@@ -22,6 +22,7 @@
   };
 
   let activeTab = null;
+  let existing = {}; // current saved shortcuts, for duplicate detection
 
   /* --------------------------------------------------------------- */
   /* Wildcard templatizing (advanced — only when alias contains {*}) */
@@ -79,6 +80,10 @@
         '<span class="code">go ' + escapeHtml(alias) + "</span>" +
         '<span class="arrow"> → </span>opens this page';
     }
+
+    if (Object.prototype.hasOwnProperty.call(existing, alias)) {
+      els.map.innerHTML += ' <span class="note">· updates existing</span>';
+    }
   }
 
   /* --------------------------------------------------------------- */
@@ -127,6 +132,7 @@
 
   async function init() {
     await gsInitTheme();
+    existing = await gsGetLinks();
 
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     activeTab = tab || null;
