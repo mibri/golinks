@@ -1,12 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="system">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GoSlash</title>
   <style>
-    /* ---- Notion-inspired palette ---- */
+    /* ---- Constants ---- */
     :root {
+      --radius: 6px;
+      --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+              Helvetica, "Apple Color Emoji", Arial, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    /* ---- Light theme (default) ---- */
+    :root, :root[data-theme="light"] {
       --ink:        #37352f;
       --ink-soft:   #787774;
       --ink-faint:  #9b9a97;
@@ -17,14 +25,25 @@
       --field:      #ffffff;
       --accent:     #2383e2;
       --accent-bg:  rgba(35, 131, 226, 0.08);
-      --good:       #448361;
-      --radius:     6px;
-      --font: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-              Helvetica, "Apple Color Emoji", Arial, sans-serif;
     }
 
+    /* ---- Dark theme (explicit) ---- */
+    :root[data-theme="dark"] {
+      --ink:       #e9e9e7;
+      --ink-soft:  #9b9a97;
+      --ink-faint: #6f6f6c;
+      --line:      rgba(255, 255, 255, 0.10);
+      --line-2:    rgba(255, 255, 255, 0.18);
+      --hover:     rgba(255, 255, 255, 0.055);
+      --bg:        #1f1f1f;
+      --field:     #2a2a2a;
+      --accent:    #5b9be8;
+      --accent-bg: rgba(91, 155, 232, 0.14);
+    }
+
+    /* ---- Dark theme (when following the system) ---- */
     @media (prefers-color-scheme: dark) {
-      :root {
+      :root[data-theme="system"] {
         --ink:       #e9e9e7;
         --ink-soft:  #9b9a97;
         --ink-faint: #6f6f6c;
@@ -39,118 +58,88 @@
     }
 
     * { box-sizing: border-box; }
-
     html, body {
-      margin: 0;
-      width: 320px;
-      background: var(--bg);
-      color: var(--ink);
-      font-family: var(--font);
-      font-size: 14px;
+      margin: 0; width: 320px;
+      background: var(--bg); color: var(--ink);
+      font-family: var(--font); font-size: 14px;
       -webkit-font-smoothing: antialiased;
     }
-
-    .wrap { padding: 14px 14px 12px; }
+    .wrap { padding: 14px 14px 13px; }
 
     /* ---- Header ---- */
-    .head {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+    .head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .mark {
-      width: 20px; height: 20px; border-radius: 5px;
-      background: var(--ink);
-      display: flex; align-items: center; justify-content: center;
-      flex: 0 0 auto;
+      width: 20px; height: 20px; border-radius: 5px; background: var(--ink);
+      display: flex; align-items: center; justify-content: center; flex: 0 0 auto;
     }
-    .mark svg { display: block; }
     .title { font-weight: 600; letter-spacing: -0.01em; }
     .head .spacer { flex: 1; }
-    .icon-btn {
-      border: none; background: none; cursor: pointer;
-      color: var(--ink-faint); padding: 4px; border-radius: 5px;
-      display: flex; line-height: 0;
+    .manage {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font); font-size: 12px; font-weight: 500;
+      color: var(--ink-soft); background: none; border: none; cursor: pointer;
+      padding: 4px 6px; border-radius: 5px;
     }
-    .icon-btn:hover { background: var(--hover); color: var(--ink-soft); }
+    .manage:hover { background: var(--hover); color: var(--ink); }
+    .manage svg { color: var(--ink-faint); }
+
+    .lead { font-size: 12.5px; color: var(--ink-faint); margin: 0 0 12px 28px; }
 
     /* ---- Current page card ---- */
     .page {
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 9px 10px;
-      margin-bottom: 12px;
-      background: var(--field);
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 9px 10px; margin-bottom: 14px; background: var(--field);
     }
+    .page-row { display: flex; align-items: center; gap: 8px; }
+    .fav {
+      width: 16px; height: 16px; border-radius: 4px; flex: 0 0 auto;
+      background: var(--hover); object-fit: contain;
+    }
+    .page-text { min-width: 0; flex: 1; }
     .page-title {
-      font-weight: 500;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      margin-bottom: 2px;
+      font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
     .page-url {
-      color: var(--ink-faint);
-      font-size: 12px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: var(--ink-faint); font-size: 12px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;
     }
 
     /* ---- Alias field ---- */
     .label {
       font-size: 11px; font-weight: 500; text-transform: uppercase;
-      letter-spacing: 0.04em; color: var(--ink-faint);
-      margin: 0 2px 6px;
+      letter-spacing: 0.04em; color: var(--ink-faint); margin: 0 2px 6px;
     }
     .field-row { display: flex; align-items: stretch; gap: 6px; }
     .prefix {
-      display: flex; align-items: center;
-      padding: 0 8px;
-      font-size: 13px; color: var(--ink-faint);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      background: var(--hover);
-      user-select: none;
+      display: flex; align-items: center; padding: 0 9px;
+      font-family: var(--mono); font-size: 13px; color: var(--ink-soft);
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--hover); user-select: none;
     }
     input[type="text"] {
-      flex: 1; width: 100%;
-      font-family: var(--font); font-size: 14px;
-      color: var(--ink);
-      padding: 8px 10px;
-      border: 1px solid var(--line-2);
-      border-radius: var(--radius);
-      background: var(--field);
-      outline: none;
+      flex: 1; width: 100%; font-family: var(--font); font-size: 14px;
+      color: var(--ink); padding: 8px 10px;
+      border: 1px solid var(--line-2); border-radius: var(--radius);
+      background: var(--field); outline: none;
       transition: border-color .12s ease, box-shadow .12s ease;
     }
     input[type="text"]::placeholder { color: var(--ink-faint); }
-    input[type="text"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-bg);
-    }
+    input[type="text"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
 
-    /* ---- Wildcard preview ---- */
-    .preview {
-      display: none;
-      margin: 8px 2px 0;
-      font-size: 12px;
-      color: var(--ink-soft);
-      line-height: 1.4;
-      word-break: break-all;
+    /* ---- Live mapping line ---- */
+    .map {
+      margin: 9px 2px 0; font-size: 12.5px; color: var(--ink-faint);
+      line-height: 1.45; word-break: break-word; min-height: 17px;
     }
-    .preview.show { display: block; }
-    .preview code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 11.5px;
-      background: var(--hover);
-      padding: 1px 4px; border-radius: 4px;
-      color: var(--ink);
+    .map .code {
+      font-family: var(--mono); font-size: 12px; color: var(--ink);
+      background: var(--hover); padding: 1px 5px; border-radius: 4px;
     }
-    .preview .star { color: var(--accent); font-weight: 600; }
+    .map .arrow { color: var(--ink-faint); margin: 0 2px; }
+    .map .star { color: var(--accent); font-weight: 600; }
 
     /* ---- Footer ---- */
-    .foot {
-      display: flex; align-items: center; gap: 8px;
-      margin-top: 12px;
-    }
+    .foot { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
     .hint { font-size: 12px; color: var(--ink-faint); flex: 1; }
     .hint kbd {
       font-family: var(--font); font-size: 11px;
@@ -159,22 +148,19 @@
     }
     .btn {
       font-family: var(--font); font-size: 13px; font-weight: 500;
-      color: #fff; background: var(--accent);
-      border: none; border-radius: var(--radius);
-      padding: 7px 14px; cursor: pointer;
+      color: #fff; background: var(--accent); border: none;
+      border-radius: var(--radius); padding: 7px 14px; cursor: pointer;
       transition: filter .12s ease;
     }
     .btn:hover { filter: brightness(1.05); }
-    .btn:disabled { opacity: .5; cursor: default; filter: none; }
+    .btn:disabled { opacity: .45; cursor: default; filter: none; }
 
     /* ---- Toast ---- */
     .toast {
       position: fixed; left: 0; right: 0; bottom: 0;
-      transform: translateY(100%);
-      transition: transform .18s ease;
+      transform: translateY(100%); transition: transform .18s ease;
       background: var(--ink); color: var(--bg);
-      font-size: 12.5px; font-weight: 500;
-      padding: 9px 14px;
+      font-size: 12.5px; font-weight: 500; padding: 9px 14px;
       display: flex; align-items: center; gap: 7px;
     }
     .toast.show { transform: translateY(0); }
@@ -191,31 +177,40 @@
       </span>
       <span class="title">GoSlash</span>
       <span class="spacer"></span>
-      <button id="openOptions" class="icon-btn" title="Open dashboard" aria-label="Open dashboard">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 10.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z" stroke="currentColor" stroke-width="1.3"/>
-          <path d="M8 1.5v1.7M8 12.8v1.7M14.5 8h-1.7M3.2 8H1.5M12.6 3.4l-1.2 1.2M4.6 11.4l-1.2 1.2M12.6 12.6l-1.2-1.2M4.6 4.6 3.4 3.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+      <button id="openOptions" class="manage" title="Manage all shortcuts">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M2 3.5h7M2 7h10M2 10.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          <circle cx="11" cy="3.5" r="1.4" fill="currentColor"/>
+          <circle cx="9.5" cy="10.5" r="1.4" fill="currentColor"/>
         </svg>
+        Manage
       </button>
     </div>
 
+    <p class="lead">Save the page below as a <b>go</b> shortcut.</p>
+
     <div class="page">
-      <div id="pageTitle" class="page-title">Loading…</div>
-      <div id="pageUrl" class="page-url"></div>
+      <div class="page-row">
+        <img id="fav" class="fav" alt="" />
+        <div class="page-text">
+          <div id="pageTitle" class="page-title">Loading…</div>
+          <div id="pageUrl" class="page-url"></div>
+        </div>
+      </div>
     </div>
 
-    <div class="label">Shortcut alias</div>
+    <div class="label">Give it a short alias</div>
     <div class="field-row">
       <span class="prefix">go</span>
-      <input id="alias" type="text" placeholder="cal  ·  gh/{*}  ·  team/wiki"
+      <input id="alias" type="text" placeholder="calendar"
              autocomplete="off" autocapitalize="off" spellcheck="false" autofocus />
     </div>
 
-    <div id="preview" class="preview"></div>
+    <div id="map" class="map"></div>
 
     <div class="foot">
       <div class="hint">Press <kbd>Enter</kbd> to save</div>
-      <button id="save" class="btn" disabled>Save</button>
+      <button id="save" class="btn" disabled>Save shortcut</button>
     </div>
   </div>
 

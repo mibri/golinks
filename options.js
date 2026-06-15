@@ -14,6 +14,11 @@
 
   const $ = (id) => document.getElementById(id);
   const el = {
+    themeSeg: $("themeSeg"),
+    qAlias: $("qAlias"),
+    qUrl: $("qUrl"),
+    qAdd: $("qAdd"),
+    qHint: $("qHint"),
     list: $("list"),
     raw: $("raw"),
     rawMsg: $("rawMsg"),
@@ -328,8 +333,62 @@
   });
 
   /* =============================================================== */
+  /* Theme                                                           */
+  /* =============================================================== */
+
+  function markTheme(theme) {
+    [...el.themeSeg.children].forEach((b) =>
+      b.classList.toggle("active", b.dataset.theme === theme)
+    );
+  }
+
+  async function selectTheme(theme) {
+    gsApplyTheme(theme);
+    markTheme(theme);
+    await gsSetTheme(theme);
+  }
+
+  /* =============================================================== */
+  /* Quick add                                                       */
+  /* =============================================================== */
+
+  function quickHint(msg, isErr) {
+    el.qHint.innerHTML = msg;
+    el.qHint.className = "quick-hint" + (isErr ? " err" : "");
+  }
+
+  async function quickAdd() {
+    const alias = el.qAlias.value.trim();
+    const url = el.qUrl.value.trim();
+    if (!alias) return quickHint("Enter an alias.", true);
+    if (!url) return quickHint("Enter a target URL.", true);
+
+    const existed = Object.prototype.hasOwnProperty.call(links, alias);
+    links[alias] = { type: "single", target: gsNormalizeUrl(url) };
+    await persist();
+
+    el.qAlias.value = "";
+    el.qUrl.value = "";
+    quickHint(
+      (existed ? "Updated " : "Added ") +
+        '<code>go ' + escapeHtml(alias) + "</code>.",
+      false
+    );
+    el.qAlias.focus();
+  }
+
+  /* =============================================================== */
   /* Wiring                                                          */
   /* =============================================================== */
+
+  [...el.themeSeg.children].forEach((b) =>
+    b.addEventListener("click", () => selectTheme(b.dataset.theme))
+  );
+
+  el.qAdd.addEventListener("click", quickAdd);
+  [el.qAlias, el.qUrl].forEach((input) =>
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") quickAdd(); })
+  );
 
   el.newBtn.addEventListener("click", () => openModal(null));
   el.modalCancel.addEventListener("click", closeModal);
@@ -379,6 +438,10 @@
   /* =============================================================== */
 
   async function init() {
+    const theme = await gsGetTheme();
+    gsApplyTheme(theme);
+    markTheme(theme);
+
     links = await gsGetLinks();
     renderList();
     renderRaw();

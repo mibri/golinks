@@ -1,18 +1,20 @@
 /*
- * popup.js — quick "add this page as a shortcut" UI.
+ * popup.js — quick "save this page as a shortcut" UI.
  *
  * Reads the active tab, lets the user assign an alias, and writes straight to
- * chrome.storage.local. If the alias contains a {*} wildcard, the current URL
- * is auto-templatized and previewed before saving.
+ * chrome.storage.local. A live mapping line ("go cal → opens this page") makes
+ * it obvious that the *current* page is what gets saved. If the alias contains a
+ * {*} wildcard (advanced), the URL is auto-templatized and previewed instead.
  */
 (function () {
   "use strict";
 
   const els = {
+    fav: document.getElementById("fav"),
     pageTitle: document.getElementById("pageTitle"),
     pageUrl: document.getElementById("pageUrl"),
     alias: document.getElementById("alias"),
-    preview: document.getElementById("preview"),
+    map: document.getElementById("map"),
     save: document.getElementById("save"),
     toast: document.getElementById("toast"),
     toastMsg: document.getElementById("toastMsg"),
@@ -22,43 +24,34 @@
   let activeTab = null;
 
   /* --------------------------------------------------------------- */
-  /* Wildcard templatizing                                           */
+  /* Wildcard templatizing (advanced — only when alias contains {*}) */
   /* --------------------------------------------------------------- */
 
-  /**
-   * Turn a concrete URL into a {*} template by replacing the most specific
-   * variable bit: the last query-param value, else the last path segment.
-   */
   function templatize(rawUrl) {
     try {
       const u = new URL(rawUrl);
-
-      // Prefer the last query parameter's value.
-      const entries = [...u.searchParams.keys()];
-      if (entries.length) {
-        const lastKey = entries[entries.length - 1];
-        u.searchParams.set(lastKey, "__GS_STAR__");
+      const keys = [...u.searchParams.keys()];
+      if (keys.length) {
+        u.searchParams.set(keys[keys.length - 1], "__GS_STAR__");
         return decodeStar(u.toString());
       }
-
-      // Otherwise the last non-empty path segment.
       const parts = u.pathname.split("/").filter(Boolean);
       if (parts.length) {
         parts[parts.length - 1] = "__GS_STAR__";
         u.pathname = "/" + parts.join("/");
         return decodeStar(u.toString());
       }
-
-      // Nothing to vary — append the wildcard.
       return rawUrl.replace(/\/?$/, "/") + "{*}";
     } catch {
       return rawUrl;
     }
   }
+  const decodeStar = (s) => s.replace(/__GS_STAR__/g, "{*}");
 
-  function decodeStar(s) {
-    return s.replace(/__GS_STAR__/g, "{*}");
+  function escapeHtml(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
+  const withStars = (s) => escapeHtml(s).replace(/\{\*\}/g, '<span class="star">{*}</span>');
 
   /* --------------------------------------------------------------- */
   /* Rendering                                                       */
@@ -67,34 +60,24 @@
   function currentTarget() {
     if (!activeTab) return "";
     const alias = els.alias.value.trim();
-    if (alias.includes("{*}")) return templatize(activeTab.url || "");
-    return activeTab.url || "";
+    return alias.includes("{*}") ? templatize(activeTab.url || "") : activeTab.url || "";
   }
 
-  function renderPreview() {
+  function render() {
     const alias = els.alias.value.trim();
-    const hasAlias = alias.length > 0;
-    els.save.disabled = !hasAlias || !activeTab;
+    els.save.disabled = !alias || !activeTab;
 
-    if (alias.includes("{*}")) {
-      const target = currentTarget();
-      const html = escapeHtml(target).replace(
-        /\{\*\}/g,
-        '<span class="star">{*}</span>'
-      );
-      els.preview.innerHTML = "Saves as <code>" + html + "</code>";
-      els.preview.classList.add("show");
-    } else {
-      els.preview.classList.remove("show");
-      els.preview.innerHTML = "";
+    if (!alias) {
+      els.map.innerHTML = "";
+      return;
     }
-  }
-
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    if (alias.includes("{*}")) {
+      els.map.innerHTML = "Saves as <span class=\"code\">" + withStars(currentTarget()) + "</span>";
+    } else {
+      els.map.innerHTML =
+        '<span class="code">go ' + escapeHtml(alias) + "</span>" +
+        '<span class="arrow"> → </span>opens this page';
+    }
   }
 
   /* --------------------------------------------------------------- */
@@ -107,13 +90,10 @@
 
     const links = await gsGetLinks();
     const exists = Object.prototype.hasOwnProperty.call(links, alias);
-
     links[alias] = { type: "single", target: currentTarget() };
     await gsSetLinks(links);
 
     showToast(exists ? "Updated “go " + alias + "”" : "Saved “go " + alias + "”");
-    els.alias.value = "";
-    renderPreview();
     setTimeout(() => window.close(), 850);
   }
 
@@ -129,12 +109,9 @@
   /* Wiring                                                          */
   /* --------------------------------------------------------------- */
 
-  els.alias.addEventListener("input", renderPreview);
+  els.alias.addEventListener("input", render);
   els.alias.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      save();
-    }
+    if (e.key === "Enter") { e.preventDefault(); save(); }
   });
   els.save.addEventListener("click", save);
   els.openOptions.addEventListener("click", () => {
@@ -143,17 +120,22 @@
   });
 
   async function init() {
+    await gsInitTheme();
+
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     activeTab = tab || null;
 
     if (activeTab) {
       els.pageTitle.textContent = activeTab.title || "Untitled";
       els.pageUrl.textContent = activeTab.url || "";
+      if (activeTab.favIconUrl) els.fav.src = activeTab.favIconUrl;
+      else els.fav.style.visibility = "hidden";
     } else {
       els.pageTitle.textContent = "No active tab";
       els.pageUrl.textContent = "";
+      els.fav.style.visibility = "hidden";
     }
-    renderPreview();
+    render();
     els.alias.focus();
   }
 
