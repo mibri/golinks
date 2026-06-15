@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root{
+    --ink:#e9e9e7;--soft:#a4a39f;--faint:#76756f;
+    --line:rgba(255,255,255,.10);--card:#202020;--accent:#5b9be8;--accentbg:rgba(91,155,232,.14);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:1280px;height:800px;overflow:hidden;
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .scene{position:relative;width:1280px;height:800px;background:#161616;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .scene::before{content:"";position:absolute;width:900px;height:900px;left:-200px;bottom:-360px;
+    border-radius:50%;background:radial-gradient(circle,rgba(91,155,232,.14),transparent 68%);}
+  .brand{position:relative;display:flex;align-items:center;gap:13px;margin-bottom:8px;}
+  .mark{width:40px;height:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;}
+  .brand h1{font-size:34px;font-weight:680;letter-spacing:-.02em;color:var(--ink);margin:0;}
+  .tag{position:relative;font-size:18px;color:var(--soft);margin:0 0 44px;}
+  .grid{position:relative;display:grid;grid-template-columns:repeat(2,420px);gap:20px;}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 26px;}
+  .feat .ic{width:38px;height:38px;border-radius:10px;background:var(--accentbg);color:var(--accent);
+    display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+  .feat h3{font-size:18px;font-weight:620;color:var(--ink);margin:0 0 7px;letter-spacing:-.01em;}
+  .feat p{font-size:14.5px;line-height:1.5;color:var(--soft);margin:0;}
+  .feat code{font-family:var(--mono);font-size:.86em;background:rgba(255,255,255,.07);color:var(--ink);padding:1px 5px;border-radius:4px;}
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="brand">
+      <span class="mark"><svg width="22" height="22" viewBox="0 0 17 17" fill="none"><path d="M12 4 L5 13" stroke="#37352f" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+      <h1>GoSlash</h1>
+    </div>
+    <p class="tag">Fast, private shortlinks that live entirely in your browser.</p>
+    <div class="grid">
+      <div class="feat">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2.2" fill="currentColor"/></svg></div>
+        <h3>Smart Focus</h3>
+        <p>Already have the site open? GoSlash jumps to that tab across any window instead of opening a duplicate.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M10 4v12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+        <h3>Wildcards</h3>
+        <p>Templates like <code>gh/{*}</code> capture whatever you type and drop it into the URL — <code>go gh/anthropics</code>.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="4" width="6" height="6" rx="1.3" stroke="currentColor" stroke-width="1.5"/><rect x="7" y="11" width="6" height="5" rx="1.3" stroke="currentColor" stroke-width="1.5"/></svg></div>
+        <h3>Tab bundles</h3>
+        <p>One alias opens a whole set of tabs, neatly wrapped in a named, colored Chrome tab group.</p>
+      </div>
+      <div class="feat">
+        <div class="ic"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3 4 5.5v4C4 13 6.6 15.6 10 17c3.4-1.4 6-4 6-7.5v-4L10 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+        <h3>100% local</h3>
+        <p>No accounts, no servers, no tracking. Everything stays in <code>chrome.storage.local</code> — export anytime.</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

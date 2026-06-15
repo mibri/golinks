@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root{
+    --ink:#37352f;--soft:#787774;--faint:#9b9a97;
+    --line:rgba(55,53,47,.10);--accent:#2383e2;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:1280px;height:800px;overflow:hidden;
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .scene{position:relative;width:1280px;height:800px;
+    background:linear-gradient(135deg,#edf0f4 0%,#f5f3f0 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .copy{text-align:center;margin-bottom:38px;}
+  .copy h1{font-size:42px;font-weight:680;letter-spacing:-.025em;color:var(--ink);margin:0 0 12px;}
+  .copy p{font-size:19px;color:var(--soft);margin:0;}
+  .copy .kbd{font-family:var(--mono);font-size:.82em;background:#fff;border:1px solid var(--line);border-radius:5px;padding:2px 7px;color:var(--ink);}
+
+  .browser{position:relative;width:1000px;background:#fff;border-radius:14px;overflow:hidden;
+    box-shadow:0 40px 80px -28px rgba(20,20,30,.40),0 0 0 1px rgba(55,53,47,.06);}
+  .tabbar{height:44px;background:#dee1e6;display:flex;align-items:flex-end;padding:0 12px;gap:6px;position:relative;z-index:3;}
+  .tab{background:#f3f4f6;border-radius:9px 9px 0 0;height:34px;width:220px;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:12.5px;color:var(--soft);}
+  .toolbar{height:54px;background:#f3f4f6;display:flex;align-items:center;padding:0 14px;gap:12px;border-bottom:1px solid rgba(55,53,47,.08);position:relative;z-index:3;}
+  .nav{color:#9aa0a6;font-size:17px;letter-spacing:3px;}
+  .omni{flex:1;position:relative;}
+  .omnibar{height:34px;background:#fff;border:1px solid #c9cdd3;border-radius:18px;display:flex;align-items:center;padding:0 14px;gap:8px;font-size:14px;color:var(--ink);}
+  .omnibar .key{font-family:var(--mono);background:rgba(35,131,226,.12);color:var(--accent);font-size:12px;font-weight:600;padding:2px 8px;border-radius:5px;}
+  .omnibar .cursor{width:1.5px;height:17px;background:var(--accent);}
+
+  .page{height:300px;background:#fff;position:relative;z-index:1;}
+
+  .drop{position:absolute;left:0;right:0;top:42px;background:#fff;border:1px solid #e6e7ea;border-radius:10px;
+    box-shadow:0 18px 40px -12px rgba(20,20,30,.28);overflow:hidden;padding:4px 0;}
+  .sug{display:flex;align-items:center;gap:12px;padding:10px 16px;font-size:13.5px;}
+  .sug.sel{background:rgba(35,131,226,.08);}
+  .sug .ico{color:var(--faint);font-size:13px;width:14px;text-align:center;}
+  .sug .a{font-family:var(--mono);font-weight:600;color:var(--ink);}
+  .sug .a .star{color:var(--accent);}
+  .sug .dash{color:var(--faint);margin:0 3px;}
+  .sug .u{color:var(--soft);}
+  .sug .pill{margin-left:auto;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:var(--soft);background:rgba(55,53,47,.06);padding:2px 7px;border-radius:4px;}
+  .sug .pill.b{color:var(--accent);background:rgba(35,131,226,.10);}
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="copy">
+      <h1>Type <span style="color:var(--accent)">go</span>, then your shortcut</h1>
+      <p>Hit <span class="kbd">go</span> + <span class="kbd">Space</span> in the address bar — no new tab, no mouse.</p>
+    </div>
+    <div class="browser">
+      <div class="tabbar">
+        <div class="tab">🌐 New Tab</div>
+      </div>
+      <div class="toolbar">
+        <span class="nav">‹ › ⟳</span>
+        <div class="omni">
+          <div class="omnibar">
+            <span class="key">go</span>
+            <span>cal</span>
+            <span class="cursor"></span>
+          </div>
+          <div class="drop">
+            <div class="sug sel">
+              <span class="ico">↵</span>
+              <span><span class="a">cal</span> <span class="dash">—</span> <span class="u">https://calendar.google.com</span></span>
+              <span class="pill">Link</span>
+            </div>
+            <div class="sug">
+              <span class="ico">↵</span>
+              <span><span class="a">calendar/<span class="star">{*}</span></span> <span class="dash">—</span> <span class="u">https://calendar.google.com/calendar/u/{*}</span></span>
+              <span class="pill">Link</span>
+            </div>
+            <div class="sug">
+              <span class="ico">↵</span>
+              <span><span class="a">catchup</span> <span class="dash">—</span> <span class="u">bundle · 3 tabs</span></span>
+              <span class="pill b">Bundle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page"></div>
+    </div>
+  </div>
+</body>
+</html>

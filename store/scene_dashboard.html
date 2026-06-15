@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root {
+    --ink:#37352f; --soft:#787774; --faint:#9b9a97;
+    --line:rgba(55,53,47,.10); --line2:rgba(55,53,47,.16); --hover:rgba(55,53,47,.045);
+    --bg:#fff; --panel:#fbfbfa; --field:#fff; --accent:#2383e2; --accentbg:rgba(35,131,226,.08);
+    --info:rgba(35,131,226,.06);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:1280px;height:800px;overflow:hidden;
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .scene{position:relative;width:1280px;height:800px;
+    background:linear-gradient(135deg,#e9ecf1 0%,#f4f2ef 100%);
+    display:flex;flex-direction:column;align-items:center;}
+  .copy{padding:48px 0 22px;text-align:center;}
+  .copy h1{font-size:38px;font-weight:680;letter-spacing:-.025em;color:var(--ink);margin:0 0 8px;}
+  .copy p{font-size:18px;color:var(--soft);margin:0;}
+
+  .window{width:980px;background:var(--bg);border-radius:14px;overflow:hidden;
+    box-shadow:0 40px 80px -28px rgba(20,20,30,.42),0 0 0 1px rgba(55,53,47,.06);}
+  .chrome{height:42px;background:var(--panel);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:8px;}
+  .dot{width:11px;height:11px;border-radius:50%;}
+  .dot.r{background:#ff5f57;}.dot.y{background:#febc2e;}.dot.g{background:#28c840;}
+  .chrome .addr{margin-left:14px;font-size:12px;color:var(--faint);}
+
+  .body{padding:26px 30px 30px;}
+  header{display:flex;align-items:center;gap:11px;margin-bottom:5px;}
+  .mark{width:28px;height:28px;border-radius:7px;background:var(--ink);display:flex;align-items:center;justify-content:center;}
+  h2.brand{font-size:19px;font-weight:650;letter-spacing:-.02em;margin:0;}
+  header .spacer{flex:1;}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+  .seg span{font-size:12.5px;font-weight:500;color:var(--faint);padding:5px 11px;display:inline-flex;align-items:center;gap:5px;}
+  .seg span svg{color:var(--faint);}
+  .seg span.active{background:var(--hover);color:var(--ink);}
+  .seg span+span{border-left:1px solid var(--line);}
+  .sub{color:var(--faint);font-size:13px;margin:0 0 20px 39px;}
+
+  .quick{border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:22px;background:var(--panel);}
+  .qt{font-size:13px;font-weight:600;margin:0 0 10px;}
+  .qrow{display:flex;gap:8px;}
+  .qalias{display:flex;flex:0 0 32%;}
+  .qalias .pfx{display:flex;align-items:center;padding:0 9px;font-family:var(--mono);font-size:12.5px;color:var(--soft);
+    border:1px solid var(--line2);border-right:none;border-radius:6px 0 0 6px;background:var(--hover);}
+  .qalias .inp{flex:1;border:1px solid var(--line2);border-radius:0 6px 6px 0;padding:8px 10px;font-family:var(--mono);font-size:12.5px;color:var(--faint);}
+  .qurl{flex:1;border:1px solid var(--line2);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:12.5px;color:var(--faint);}
+  .qadd{font-size:13px;font-weight:500;color:#fff;background:var(--accent);border-radius:6px;padding:8px 16px;display:flex;align-items:center;}
+
+  .listhead{display:flex;align-items:center;margin-bottom:12px;}
+  .listhead h3{font-size:14px;font-weight:650;margin:0;}
+  .listhead .cnt{font-size:12px;color:var(--faint);margin-left:6px;font-weight:500;}
+  .listhead .spacer{flex:1;}
+  .tbtn{font-size:12.5px;font-weight:500;color:var(--ink);border:1px solid var(--line2);border-radius:6px;padding:6px 11px;display:inline-flex;align-items:center;gap:6px;margin-left:8px;}
+  .tbtn svg{color:var(--soft);}
+
+  .list{border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  .row{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .rmain{flex:1;min-width:0;}
+  .alias{font-family:var(--mono);font-size:13px;font-weight:600;}
+  .alias .go{color:var(--faint);font-weight:500;}
+  .alias .star{color:var(--accent);}
+  .tgt{font-size:12.5px;color:var(--faint);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .badges{display:flex;gap:5px;}
+  .tag{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;padding:2px 6px;border-radius:4px;background:var(--hover);color:var(--soft);}
+  .tag.bundle{background:var(--accentbg);color:var(--accent);}
+  .acts{display:flex;gap:2px;color:var(--faint);}
+  .acts span{padding:6px;display:flex;}
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="copy">
+      <h1>Manage everything in one place</h1>
+      <p>Search, edit, and organize your shortcuts — links, wildcards, and tab bundles.</p>
+    </div>
+    <div class="window">
+      <div class="chrome">
+        <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+        <span class="addr">GoSlash · Dashboard</span>
+      </div>
+      <div class="body">
+        <header>
+          <span class="mark"><svg width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M12 4 L5 13" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+          <h2 class="brand">GoSlash</h2>
+          <span class="spacer"></span>
+          <span class="seg">
+            <span class="active"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><rect x="1.5" y="2.5" width="11" height="7.5" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M5 12h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Auto</span>
+            <span>Light</span>
+            <span>Dark</span>
+          </span>
+        </header>
+        <p class="sub">Local-first shortlinks · everything is stored in this browser only.</p>
+
+        <div class="quick">
+          <p class="qt">Add a shortcut</p>
+          <div class="qrow">
+            <span class="qalias"><span class="pfx">go</span><span class="inp">cal</span></span>
+            <span class="qurl">https://calendar.google.com</span>
+            <span class="qadd">Add</span>
+          </div>
+        </div>
+
+        <div class="listhead">
+          <h3>Your shortcuts<span class="cnt">· 4</span></h3>
+          <span class="spacer"></span>
+          <span class="tbtn"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2.5v9M2.5 7h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>New (advanced)</span>
+          <span class="tbtn"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 9V2M4 5 7 2l3 3M2 11h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Export</span>
+        </div>
+
+        <div class="list">
+          <div class="row">
+            <span class="rmain"><span class="alias"><span class="go">go</span> cal</span><div class="tgt">https://calendar.google.com</div></span>
+            <span class="badges"><span class="tag">Link</span></span>
+            <span class="acts"><span>↗</span></span>
+          </div>
+          <div class="row">
+            <span class="rmain"><span class="alias"><span class="go">go</span> gh/<span class="star">{*}</span></span><div class="tgt">https://github.com/{*}</div></span>
+            <span class="badges"><span class="tag">Link</span></span>
+            <span class="acts"><span>↗</span></span>
+          </div>
+          <div class="row">
+            <span class="rmain"><span class="alias"><span class="go">go</span> docs</span><div class="tgt">https://docs.google.com</div></span>
+            <span class="badges"><span class="tag">Link</span><span class="tag">override</span></span>
+            <span class="acts"><span>↗</span></span>
+          </div>
+          <div class="row">
+            <span class="rmain"><span class="alias"><span class="go">go</span> morning</span><div class="tgt">3 tabs: mail.google.com · calendar.google.com · chat.google.com</div></span>
+            <span class="badges"><span class="tag bundle">Bundle</span><span class="tag">group</span></span>
+            <span class="acts"><span>↗</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
