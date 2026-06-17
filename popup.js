@@ -2,7 +2,7 @@
  * popup.js — quick "save this page as a shortcut" UI.
  *
  * Reads the active tab, lets the user assign an alias, and writes straight to
- * chrome.storage.local. A live mapping line ("go cal → opens this page") makes
+ * chrome.storage.sync. A live mapping line ("go cal → opens this page") makes
  * it obvious that the *current* page is what gets saved. If the alias contains a
  * {*} wildcard (advanced), the URL is auto-templatized and previewed instead.
  */

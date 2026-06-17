@@ -7,23 +7,30 @@ data the extension handles and what it does not.
 
 ## The short version
 
-GoSlash does not collect, transmit, sell, or share any personal data. It has no
-servers, no accounts, and no analytics. Everything you create stays in your own
-browser.
+GoSlash does not collect, transmit, sell, or share your data with the developer or
+any third party. It has no servers of its own, no developer account, and no
+analytics. Your shortcuts are stored in your browser and, if you are signed into
+Chrome, synced across your own devices by Chrome's built-in sync.
 
 ## What data GoSlash stores
 
 GoSlash stores the shortcuts you create — their aliases, target URLs, and related
 settings (such as tab-bundle and tab-group options) — together with your theme
-preference. This information is saved locally on your device using the browser's
-`chrome.storage.local` API.
+preference. This information is saved using the browser's `chrome.storage.sync`
+API.
 
 This data:
 
-- never leaves your device,
-- is not sent to the developer or any third party,
+- is stored in your browser profile,
+- is synchronized across the Chrome browsers signed into your Google account using
+  Chrome's built-in sync (the same mechanism that syncs your bookmarks), if sync is
+  enabled,
+- is not sent to the developer of GoSlash,
 - is not used for advertising or tracking,
 - can be exported or deleted by you at any time from the extension's dashboard.
+
+If you are signed out of Chrome or have sync disabled, the data simply stays on
+your device.
 
 ## Browser permissions
 
@@ -44,11 +51,14 @@ transmitted, or stored anywhere other than your local browser storage.
 
 GoSlash makes no network requests of its own. When you open a shortcut, your
 browser navigates to the URL you configured, exactly as if you had typed it
-yourself.
+yourself. Any synchronization of your shortcuts is performed by Chrome itself, not
+by GoSlash.
 
 ## Third parties
 
-GoSlash does not use any third-party services, SDKs, or trackers.
+GoSlash does not use any third-party services, SDKs, or trackers. The only data
+transfer involved is Chrome's own sync, which is provided by Google as part of your
+browser and governed by Google's Privacy Policy (https://policies.google.com/privacy).
 
 ## Children's privacy
 

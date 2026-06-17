@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "GoSlash",
   "version": "1.0.0",
-  "description": "Private, local-first shortlinks. Type \"go\" + space in the address bar to jump anywhere.",
+  "description": "Private shortlinks that sync across your Chrome. Type \"go\" + space in the address bar to jump anywhere.",
   "permissions": ["storage", "tabs", "activeTab", "windows", "tabGroups"],
   "background": {
     "service_worker": "service_worker.js"

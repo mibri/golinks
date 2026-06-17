@@ -1,8 +1,9 @@
 # GoSlash
 
-Private, local-first custom shortlinks for Chrome (Manifest V3). Type `go` in the
-address bar, press Space/Tab, then an alias — and jump anywhere. Everything is
-stored in `chrome.storage.local`; there are no remote servers or cloud databases.
+Private custom shortlinks for Chrome (Manifest V3). Type `go` in the address bar,
+press Space/Tab, then an alias — and jump anywhere. Shortcuts are stored with
+`chrome.storage.sync`, so they follow you across the Chrome browsers signed into
+your account. The extension itself has no servers and makes no network requests.
 
 ## Install (unpacked)
 
@@ -80,5 +81,6 @@ A single object keyed by alias:
 | `icons/` | Toolbar icons (regenerate with `generate_icons.py`) |
 
 ## Permissions
-`storage`, `tabs`, `activeTab`, `windows`, `tabGroups`. No host permissions, no
-network access — your shortcuts never leave the browser.
+`storage`, `tabs`, `activeTab`, `windows`, `tabGroups`. No host permissions and no
+network access — the only data movement is Chrome's own sync of your shortcuts
+across your devices.

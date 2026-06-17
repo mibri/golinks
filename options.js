@@ -1,7 +1,7 @@
 /*
  * options.js — GoSlash dashboard.
  *
- * Three coordinated views over the same chrome.storage.local "links" object:
+ * Three coordinated views over the same chrome.storage.sync "links" object:
  *   1. A CRUD list with an editor modal (single + bundle shortcuts).
  *   2. A raw JSON editor for power users.
  *   3. Import / Export of golinks.json.
