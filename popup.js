@@ -98,7 +98,13 @@
     const links = await gsGetLinks();
     const exists = Object.prototype.hasOwnProperty.call(links, alias);
     links[alias] = { type: "single", target: gsNormalizeUrl(target) };
-    await gsSetLinks(links);
+
+    try {
+      await gsSetLinks(links);
+    } catch (err) {
+      showToast("Couldn't save — Chrome sync is full");
+      return;
+    }
 
     showToast(exists ? "Updated “go " + alias + "”" : "Saved “go " + alias + "”");
     setTimeout(() => window.close(), 850);

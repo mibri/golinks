@@ -13,6 +13,37 @@
 importScripts("lib/store.js");
 
 /* ------------------------------------------------------------------ */
+/* Migration: local -> sync                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Earlier versions stored everything in chrome.storage.local. Now we use
+ * chrome.storage.sync so shortcuts follow the user across devices. On startup,
+ * if sync has no shortcuts yet but local does, copy them over once.
+ */
+async function migrateLocalToSync() {
+  try {
+    const sync = await chrome.storage.sync.get(["links", "theme"]);
+    if (sync.links && Object.keys(sync.links).length) return; // already migrated
+
+    const local = await chrome.storage.local.get(["links", "theme"]);
+    const payload = {};
+    if (local.links && Object.keys(local.links).length) payload.links = local.links;
+    if (local.theme && !sync.theme) payload.theme = local.theme;
+
+    if (Object.keys(payload).length) {
+      await chrome.storage.sync.set(payload);
+      console.log("GoSlash: migrated local shortcuts to Chrome sync.");
+    }
+  } catch (err) {
+    console.warn("GoSlash: local->sync migration skipped", err);
+  }
+}
+
+migrateLocalToSync();
+chrome.runtime.onInstalled.addListener(migrateLocalToSync);
+
+/* ------------------------------------------------------------------ */
 /* Resolution                                                          */
 /* ------------------------------------------------------------------ */
 

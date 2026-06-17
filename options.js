@@ -359,14 +359,23 @@
 
   /** Write canonical state to storage, then refresh views. */
   async function persist() {
-    await gsSetLinks(links);
+    try {
+      await gsSetLinks(links);
+    } catch (err) {
+      alert(
+        "Couldn't save to Chrome sync: " + (err && err.message ? err.message : err) +
+        "\n\nChrome sync limits total size (~100KB). Try removing some shortcuts, " +
+        "or use Export to keep a local backup."
+      );
+      links = await gsGetLinks(); // revert in-memory state to what's actually stored
+    }
     renderList();
     renderRaw();
   }
 
-  // Keep views live if the popup (or another tab) writes.
+  // Keep views live when the popup, another tab, or another synced device writes.
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area !== "local" || !changes[GS_KEY]) return;
+    if (area !== GS_AREA || !changes[GS_KEY]) return;
     links = changes[GS_KEY].newValue || {};
     renderList();
     if (!rawDirty) renderRaw();
