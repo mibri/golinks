@@ -18,23 +18,37 @@ importScripts("lib/store.js");
 
 /**
  * Earlier versions stored everything in chrome.storage.local. Now we use
- * chrome.storage.sync so shortcuts follow the user across devices. On startup,
- * if sync has no shortcuts yet but local does, copy them over once.
+ * chrome.storage.sync so shortcuts follow the user across devices.
+ *
+ * Migration runs at most once per device (guarded by a local flag) and *merges*
+ * this device's local shortcuts into the synced set as a union, rather than
+ * replacing or skipping. This way, if two devices each created shortcuts before
+ * upgrading, both contribute their unique aliases. On a same-alias collision the
+ * already-synced value wins (it's the shared canonical one). Running only once
+ * also means later deletions on another device won't be resurrected from this
+ * device's stale local copy.
  */
 async function migrateLocalToSync() {
   try {
-    const sync = await chrome.storage.sync.get(["links", "theme"]);
-    if (sync.links && Object.keys(sync.links).length) return; // already migrated
+    const local = await chrome.storage.local.get(["links", "theme", "migratedToSync"]);
+    if (local.migratedToSync) return; // already merged on this device
 
-    const local = await chrome.storage.local.get(["links", "theme"]);
-    const payload = {};
-    if (local.links && Object.keys(local.links).length) payload.links = local.links;
-    if (local.theme && !sync.theme) payload.theme = local.theme;
-
-    if (Object.keys(payload).length) {
-      await chrome.storage.sync.set(payload);
-      console.log("GoSlash: migrated local shortcuts to Chrome sync.");
+    const localLinks = local.links && typeof local.links === "object" ? local.links : {};
+    if (Object.keys(localLinks).length) {
+      const sync = await chrome.storage.sync.get("links");
+      const syncLinks = sync.links && typeof sync.links === "object" ? sync.links : {};
+      // Union; on alias collision the synced (canonical) entry wins.
+      const merged = Object.assign({}, localLinks, syncLinks);
+      await chrome.storage.sync.set({ links: merged });
+      console.log("GoSlash: merged local shortcuts into Chrome sync.");
     }
+
+    const syncTheme = await chrome.storage.sync.get("theme");
+    if (local.theme && !syncTheme.theme) {
+      await chrome.storage.sync.set({ theme: local.theme });
+    }
+
+    await chrome.storage.local.set({ migratedToSync: true });
   } catch (err) {
     console.warn("GoSlash: local->sync migration skipped", err);
   }

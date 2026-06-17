@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<style>
+  :root{--ink:#37352f;--soft:#787774;--faint:#9b9a97;--line:rgba(55,53,47,.10);--accent:#2383e2;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+  *{box-sizing:border-box}
+  html,body{margin:0;width:440px;height:280px;overflow:hidden;
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;}
+  .scene{position:relative;width:440px;height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:linear-gradient(135deg,#edf0f4 0%,#f6f4f1 100%);}
+  .scene::before{content:"";position:absolute;width:360px;height:360px;right:-110px;top:-130px;border-radius:50%;
+    background:radial-gradient(circle,rgba(35,131,226,.12),transparent 70%);}
+  .mark{position:relative;width:58px;height:58px;border-radius:15px;background:var(--ink);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 12px 26px -10px rgba(20,20,30,.45);}
+  .name{position:relative;font-size:32px;font-weight:680;letter-spacing:-.025em;color:var(--ink);margin:16px 0 5px;}
+  .tag{position:relative;font-size:14px;color:var(--soft);margin:0 0 18px;}
+  .chip{position:relative;display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:8px 12px;box-shadow:0 8px 20px -10px rgba(20,20,30,.30);font-size:14px;color:var(--ink);}
+  .chip .key{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);background:rgba(35,131,226,.12);padding:2px 8px;border-radius:5px;}
+  .chip .al{font-family:var(--mono);}
+  .chip .cursor{width:1.5px;height:15px;background:var(--accent);}
+</style>
+</head>
+<body>
+  <div class="scene">
+    <span class="mark"><svg width="30" height="30" viewBox="0 0 17 17" fill="none"><path d="M12 4 L5 13" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+    <div class="name">GoSlash</div>
+    <div class="tag">Address-bar shortcuts that sync with you</div>
+    <div class="chip"><span class="key">go</span><span class="al">cal</span><span class="cursor"></span></div>
+  </div>
+</body>
+</html>
